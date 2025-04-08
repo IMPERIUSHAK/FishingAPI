@@ -1,29 +1,13 @@
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-builder.Services.AddControllersWithViews();
-
+var builder = WebApplication.CreateBuilder();
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+ 
+app.Run(async (context) =>
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
-
-app.UseHttpsRedirection();
-app.UseRouting();
-
-app.UseAuthorization();
-
-app.MapStaticAssets();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
-
-
+    var response = context.Response;
+    response.Headers.ContentLanguage = "ru-RU";
+    response.Headers.ContentType = "text/plain; charset=utf-8";
+    response.Headers.Append("secret-id", "256");    // добавление кастомного заголовка
+    await response.WriteAsync("Привет METANIT.COM");
+});
+ 
 app.Run();

@@ -51,9 +51,9 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
-            "Microsoft.EntityFrameworkCore": {
+            "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
-              "version": "[9.0.4, )"
+              "version": "[9.0.3, )"
             }
           },
           "imports": [
