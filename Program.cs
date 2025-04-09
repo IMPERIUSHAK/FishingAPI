@@ -26,22 +26,22 @@ app.MapGet("/", async (HttpContext context, listipDbContext db) =>
 {
     using var httpClient = new HttpClient();
 
-    
+    // Получаем внешний IP
      var ip = context.Request.Headers["X-Forwarded-For"].ToString();
 
-    
+    // Если заголовок отсутствует, используем IP из соединения
     if (string.IsNullOrEmpty(ip))
     {
         ip = context.Connection.RemoteIpAddress?.ToString();
     }
-    
+    // Получаем геолокационные данные
     var locationResponse = await httpClient.GetStringAsync($"http://ip-api.com/json/{ip}");
 
-    
+    // Сохраняем IP в базу
     db.IP.Add(new listip.IP { Adress = ip });
     await db.SaveChangesAsync();
 
-   
+    // Отправляем HTML-ответ
     context.Response.ContentType = "text/html";
     await context.Response.WriteAsync($"<h2>Congrats! Connected to the server.info saved:<br>{locationResponse}</h2>");
 });
