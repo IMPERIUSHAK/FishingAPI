@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using MySql.EntityFrameworkCore;
 using listip.data;
 using System.Net.Http;
-
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -23,13 +22,25 @@ builder.Services.AddDbContext<listipDbContext>(options => {
 
 var app = builder.Build();
 
-app.MapGet("/", async context =>
+app.MapGet("/", async (HttpContext context, listipDbContext db) =>
 {
     using var httpClient = new HttpClient();
-    var ipAddress = await httpClient.GetStringAsync("https://api.ipify.org");
 
-    await context.Response.WriteAsync($"You got hacked your IP: {ipAddress}");
+    // Получаем внешний IP
+    var ip = await httpClient.GetStringAsync("https://api.ipify.org");
+
+    // Получаем геолокационные данные
+    var locationResponse = await httpClient.GetStringAsync($"http://ip-api.com/json/{ip}");
+
+    // Сохраняем IP в базу
+    db.IP.Add(new listip.IP { Adress = ip });
+    await db.SaveChangesAsync();
+
+    // Отправляем HTML-ответ
+    context.Response.ContentType = "text/html";
+    await context.Response.WriteAsync($"<h2>Congrats! You got hacked. IP info saved:<br>{locationResponse}</h2>");
 });
+
 
 //метод app run перехватывает абсолютно все маршруты поэтому лучше разделять запросы по отдельным маршрутам
 // app.Run(async context =>
