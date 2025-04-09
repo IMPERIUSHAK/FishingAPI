@@ -26,19 +26,24 @@ app.MapGet("/", async (HttpContext context, listipDbContext db) =>
 {
     using var httpClient = new HttpClient();
 
-    // Получаем внешний IP
-    var ip = await httpClient.GetStringAsync("https://api.ipify.org");
+    
+     var ip = context.Request.Headers["X-Forwarded-For"].ToString();
 
-    // Получаем геолокационные данные
+    
+    if (string.IsNullOrEmpty(ip))
+    {
+        ip = context.Connection.RemoteIpAddress?.ToString();
+    }
+    
     var locationResponse = await httpClient.GetStringAsync($"http://ip-api.com/json/{ip}");
 
-    // Сохраняем IP в базу
+    
     db.IP.Add(new listip.IP { Adress = ip });
     await db.SaveChangesAsync();
 
-    // Отправляем HTML-ответ
+   
     context.Response.ContentType = "text/html";
-    await context.Response.WriteAsync($"<h2>Congrats! You got hacked. IP info saved:<br>{locationResponse}</h2>");
+    await context.Response.WriteAsync($"<h2>Congrats! Connected to the server.info saved:<br>{locationResponse}</h2>");
 });
 
 
