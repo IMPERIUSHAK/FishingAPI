@@ -55,11 +55,11 @@ app.MapGet("/", async (HttpContext context, listipDbContext db) =>
 
 //     await context.Response.WriteAsync($"You got hacked your IP: {ipAddress}");
 // });
-app.MapGet("/adresses", async (listipDbContext db) =>
-{
-    var adresses = await db.IP.ToListAsync();
-    return Results.Json(adresses);
-});
+// app.MapGet("/adresses", async (listipDbContext db) =>
+// {
+//     var adresses = await db.IP.ToListAsync();
+//     return Results.Json(adresses);
+// });
 
 app.Run();
 
